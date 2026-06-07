@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطة غذائية مخصصة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===== THEME VARS ===== */
+[data-theme="light"] {
+  --bg: #f7faf7;
+  --surface: #ffffff;
+  --surface2: #f0f7f1;
+  --surface3: #e4f0e5;
+  --text: #1c2e20;
+  --text2: #4a6650;
+  --text3: #7a9a80;
+  --border: rgba(60,120,70,0.13);
+  --border2: rgba(60,120,70,0.25);
+  --hero-bg: #0f1f12;
+  --hero-text: #ffffff;
+  --card-shadow: 0 2px 16px rgba(60,120,70,0.07);
+  --sage: #3a7d4a;
+  --sage-l: #5aab6a;
+  --sand: #b8962a;
+  --sand-bg: #fdf6e0;
+  --sand-text: #7a5c00;
+  --warn-bg: #fff8e6;
+  --warn-border: rgba(184,150,42,0.3);
+  --modal-overlay: rgba(0,0,0,0.45);
+  --input-bg: #f0f7f1;
+}
+
+[data-theme="dark"] {
+  --bg: #0d1810;
+  --surface: #152018;
+  --surface2: #1c2c1e;
+  --surface3: #243628;
+  --text: #e8f5ea;
+  --text2: #a0c8a6;
+  --text3: #6a9a72;
+  --border: rgba(90,171,106,0.15);
+  --border2: rgba(90,171,106,0.3);
+  --hero-bg: #061008;
+  --hero-text: #e8f5ea;
+  --card-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  --sage: #5aab6a;
+  --sage-l: #7acc88;
+  --sand: #d4aa40;
+  --sand-bg: #1e1800;
+  --sand-text: #d4aa40;
+  --warn-bg: #1a1500;
+  --warn-border: rgba(212,170,64,0.25);
+  --modal-overlay: rgba(0,0,0,0.75);
+  --input-bg: #1c2c1e;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 999;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s;
+}
+.theme-toggle:hover { transform: scale(1.1); }
+
+/* ===== NAV ===== */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  transition: background 0.3s;
+}
+[data-theme="dark"] nav { background: rgba(21,32,24,0.9); }
+
+.nav-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 58px;
+}
+.nav-logo { font-family: 'Cairo',sans-serif; font-weight: 700; color: var(--sage); font-size: 1.05rem; }
+.nav-links { display: flex; gap: 4px; list-style: none; }
+.nav-links a { font-size: 13px; color: var(--text2); text-decoration: none; padding: 6px 13px; border-radius: 8px; transition: all 0.2s; }
+.nav-links a:hover { background: var(--surface2); color: var(--sage); }
+.edit-btn-nav {
+  background: var(--sage); color: white; border: none;
+  padding: 7px 16px; border-radius: 20px; font-family: 'Tajawal',sans-serif;
+  font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: all 0.2s;
+}
+.edit-btn-nav:hover { opacity: 0.88; transform: translateY(-1px); }
+
+/* ===== HERO ===== */
+.hero {
+  background: var(--hero-bg);
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 3rem 1.5rem;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 55% at 20% 55%, rgba(58,125,74,0.35) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 55% at 80% 35%, rgba(184,150,42,0.2) 0%, transparent 65%);
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(90,171,106,0.2);
+  border: 1px solid rgba(90,171,106,0.35);
+  color: #7acc88;
+  font-size: 12px; letter-spacing: 2px;
+  padding: 6px 20px; border-radius: 30px;
+  margin-bottom: 1.8rem; position: relative;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hero h1 {
+  font-family: 'Cairo',sans-serif;
+  font-size: clamp(2.4rem,7vw,4.8rem);
+  font-weight: 800; color: var(--hero-text);
+  line-height: 1.15; position: relative;
+  animation: fadeUp 0.6s 0.1s ease both;
+  margin-bottom: 0.5rem;
+}
+.hero h1 span { color: #7acc88; }
+
+.hero-sub {
+  font-size: 1rem; color: rgba(255,255,255,0.45);
+  max-width: 420px; position: relative;
+  animation: fadeUp 0.6s 0.2s ease both;
+  margin-bottom: 2.5rem;
+}
+
+.hero-stats {
+  display: flex; gap: 2px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; overflow: hidden;
+  position: relative; animation: fadeUp 0.6s 0.3s ease both;
+  margin-bottom: 1.5rem;
+}
+.hero-stat { padding: 1.1rem 1.8rem; text-align: center; border-left: 1px solid rgba(255,255,255,0.08); }
+.hero-stat:last-child { border-left: none; }
+.hero-stat-val { font-size: 1.7rem; font-weight: 700; color: white; display: block; transition: all 0.3s; }
+.hero-stat-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+.hero-edit-btn {
+  position: relative; animation: fadeUp 0.6s 0.4s ease both;
+  background: transparent; border: 1.5px solid rgba(90,171,106,0.5);
+  color: #7acc88; padding: 10px 28px; border-radius: 30px;
+  font-family: 'Tajawal',sans-serif; font-size: 14px; cursor: pointer;
+  transition: all 0.25s; display: inline-flex; align-items: center; gap: 8px;
+}
+.hero-edit-btn:hover { background: rgba(90,171,106,0.12); border-color: #7acc88; }
+
+.scroll-hint {
+  position: absolute; bottom: 1.8rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: rgba(255,255,255,0.25); font-size: 11px;
+  animation: fadeUp 1s 0.9s ease both;
+}
+.scroll-dot { width: 5px; height: 5px; background: rgba(255,255,255,0.25); border-radius: 50%; animation: bounce 1.5s infinite; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: var(--modal-overlay);
+  z-index: 500; display: none; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border-radius: 20px; padding: 2rem;
+  width: 100%; max-width: 420px;
+  border: 1px solid var(--border2);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn { from { opacity:0; transform: scale(0.93) translateY(10px); } to { opacity:1; transform: none; } }
+
+.modal-title {
+  font-family: 'Cairo',sans-serif; font-size: 1.3rem; font-weight: 700;
+  color: var(--text); margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.modal-title::before { content: '✏️'; font-size: 1.2rem; }
+
+.field-group { margin-bottom: 1rem; }
+.field-label { font-size: 13px; color: var(--text2); font-weight: 500; margin-bottom: 6px; display: block; }
+
+.field-row { display: flex; align-items: center; gap: 10px; }
+.field-input {
+  flex: 1;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  font-family: 'Tajawal',sans-serif; font-size: 1rem;
+  color: var(--text); text-align: center; font-weight: 600;
+  transition: border 0.2s;
+  width: 100%;
+}
+.field-input:focus { outline: none; border-color: var(--sage); }
+
+.field-stepper {
+  display: flex; gap: 6px;
+}
+.step-btn {
+  width: 36px; height: 36px;
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 1.1rem; cursor: pointer;
+  color: var(--sage); font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.step-btn:hover { background: var(--sage); color: white; border-color: var(--sage); }
+.step-btn:active { transform: scale(0.93); }
+
+.name-input {
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  font-family: 'Tajawal',sans-serif; font-size: 1rem;
+  color: var(--text); width: 100%;
+  transition: border 0.2s;
+}
+.name-input:focus { outline: none; border-color: var(--sage); }
+
+.modal-actions { display: flex; gap: 10px; margin-top: 1.5rem; }
+.btn-save {
+  flex: 1; background: var(--sage); color: white; border: none;
+  border-radius: 10px; padding: 12px; font-family: 'Tajawal',sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-save:hover { opacity: 0.88; }
+.btn-cancel {
+  padding: 12px 20px; background: var(--surface2); color: var(--text2);
+  border: 1px solid var(--border); border-radius: 10px;
+  font-family: 'Tajawal',sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--border2); }
+
+/* ===== SECTIONS ===== */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+section { padding: 5rem 0; }
+
+.section-label { font-size: 12px; letter-spacing: 2px; color: var(--sage); font-weight: 700; margin-bottom: 0.4rem; text-transform: uppercase; }
+.section-title { font-family: 'Cairo',sans-serif; font-size: clamp(1.5rem,3vw,2rem); font-weight: 700; color: var(--text); margin-bottom: 0.4rem; }
+.section-desc { color: var(--text3); font-size: 0.9rem; max-width: 480px; margin-bottom: 2.5rem; }
+
+/* ===== BMI ===== */
+#bmi { background: var(--surface); }
+
+.bmi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+
+.bmi-visual {
+  background: var(--hero-bg);
+  border-radius: 18px; padding: 2.2rem; text-align: center; position: relative; overflow: hidden;
+}
+.bmi-visual::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 70%, rgba(58,125,74,0.3), transparent 60%);
+}
+.bmi-number { font-family:'Cairo',sans-serif; font-size: 5.5rem; font-weight: 800; color: #7acc88; line-height: 1; position: relative; transition: all 0.4s; }
+.bmi-unit { font-size: 1rem; color: rgba(255,255,255,0.4); position: relative; margin-bottom: 0.8rem; }
+.bmi-status-pill {
+  display: inline-block; padding: 6px 18px; border-radius: 30px;
+  font-size: 13px; font-weight: 600; position: relative;
+  transition: all 0.3s;
+}
+.status-underweight { background: rgba(90,171,200,0.2); border: 1px solid rgba(90,171,200,0.35); color: #7acce8; }
+.status-normal { background: rgba(90,171,106,0.2); border: 1px solid rgba(90,171,106,0.35); color: #7acc88; }
+.status-overweight { background: rgba(212,170,64,0.2); border: 1px solid rgba(212,170,64,0.35); color: #d4aa40; }
+.status-obese { background: rgba(226,75,74,0.2); border: 1px solid rgba(226,75,74,0.35); color: #e24b4a; }
+
+.bmi-bar-wrap { margin: 1.2rem 0 0.4rem; position: relative; }
+.bmi-bar {
+  height: 9px; border-radius: 5px;
+  background: linear-gradient(to left, #E24B4A, #F0997B, #FAC775, #97C459, #5DCAA5);
+}
+.bmi-needle {
+  position: absolute; top: -4px; width: 18px; height: 18px;
+  background: white; border: 3px solid #d4aa40; border-radius: 50%;
+  transform: translateX(50%); transition: right 0.5s cubic-bezier(.34,1.56,.64,1);
+}
+.bmi-bar-labels {
+  display: flex; justify-content: space-between;
+  font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 5px;
+}
+
+.info-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.info-card { background: var(--surface2); border-radius: 12px; padding: 1rem; border: 1px solid var(--border); }
+.info-card-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.info-card-val { font-size: 1.4rem; font-weight: 700; color: var(--text); transition: all 0.3s; }
+.info-card-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.calories-card {
+  background: linear-gradient(135deg, var(--sage) 0%, var(--sage-l) 100%);
+  border-radius: 12px; padding: 1.3rem; color: white;
+  grid-column: span 2;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.3s;
+}
+.calories-card .num { font-size: 2rem; font-weight: 800; }
+.calories-card .lbl { font-size: 12px; opacity: 0.8; }
+.calories-split { display: flex; gap: 1.5rem; }
+.cal-item { text-align: center; }
+.cal-item .v { font-weight: 700; font-size: 1rem; }
+.cal-item .l { font-size: 10px; opacity: 0.7; }
+
+/* ===== MEALS ===== */
+#meals { background: var(--bg); }
+
+.meal-tabs { display: flex; gap: 6px; margin-bottom: 2rem; flex-wrap: wrap; }
+.meal-tab {
+  padding: 7px 18px; border-radius: 30px;
+  border: 1.5px solid var(--border2); background: transparent;
+  color: var(--text2); font-family:'Tajawal',sans-serif; font-size: 13px;
+  cursor: pointer; transition: all 0.2s;
+}
+.meal-tab.active { background: var(--sage); border-color: var(--sage); color: white; }
+.meal-tab:hover:not(.active) { border-color: var(--sage); color: var(--sage); }
+
+.day-plan { display: none; }
+.day-plan.active { display: block; }
+
+.meal-card {
+  background: var(--surface); border-radius: 14px;
+  border: 1px solid var(--border); margin-bottom: 10px; overflow: hidden;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+.meal-card:hover { box-shadow: var(--card-shadow); border-color: var(--border2); }
+
+.meal-header {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.9rem 1.3rem; border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.meal-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--sage); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.meal-title { font-weight: 700; color: var(--text); font-size: 0.95rem; }
+.meal-time { font-size: 11px; color: var(--text3); }
+.meal-cals { margin-right: auto; background: var(--surface3); color: var(--sage); font-weight: 700; font-size: 12px; padding: 4px 11px; border-radius: 20px; border: 1px solid var(--border); }
+
+.meal-body { padding: 0.9rem 1.3rem; }
+
+.food-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.food-table th { text-align: right; padding: 7px 10px; font-size: 11px; color: var(--text3); font-weight: 600; border-bottom: 1px solid var(--border); }
+.food-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+.food-table tr:last-child td { border-bottom: none; }
+.food-table tr:hover td { background: var(--surface2); }
+
+.tag { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+.tag-protein { background: var(--rose-bg,#fdf0f0); color: #b05050; }
+.tag-carb { background: var(--sand-bg); color: var(--sand-text); }
+.tag-fat { background: var(--surface2); color: var(--sage); }
+.tag-veg { background: #e8f5ec; color: #2d6b40; }
+[data-theme="dark"] .tag-protein { background: rgba(180,80,80,0.15); color: #e88080; }
+[data-theme="dark"] .tag-veg { background: rgba(45,107,64,0.2); color: #7acc88; }
+
+/* ===== WEEKLY ===== */
+#weekly { background: var(--surface); }
+
+.weekly-table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); font-size: 13px; }
+.weekly-table th { background: var(--hero-bg); color: rgba(255,255,255,0.85); padding: 12px 14px; text-align: right; font-weight: 600; font-size: 12px; }
+.weekly-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); line-height: 1.5; }
+.weekly-table tr:last-child td { border-bottom: none; }
+.weekly-table tr:hover td { background: var(--surface2); }
+.day-badge { display: inline-block; background: var(--sage); color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+.cal-badge { display: inline-block; background: var(--sand-bg); color: var(--sand-text); font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 6px; margin-top: 4px; }
+
+/* ===== TIPS ===== */
+#tips { background: var(--bg); }
+
+.tips-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; }
+.tip-card {
+  border: 1px solid var(--border); border-radius: 14px; padding: 1.3rem;
+  background: var(--surface); transition: all 0.2s;
+}
+.tip-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: var(--card-shadow); }
+.tip-icon { font-size: 1.8rem; margin-bottom: 0.8rem; display: block; }
+.tip-title { font-weight: 700; color: var(--text); margin-bottom: 0.4rem; font-size: 0.9rem; }
+.tip-text { font-size: 12px; color: var(--text3); line-height: 1.6; }
+
+/* ===== FOOTER ===== */
+footer { background: var(--hero-bg); color: rgba(255,255,255,0.35); text-align: center; padding: 2.5rem 1.5rem; font-size: 12px; }
+footer strong { color: #7acc88; }
+
+/* ===== WORKOUT ===== */
+#workout { background: var(--bg); }
+
+.location-picker {
+  display: flex; gap: 12px; margin-bottom: 2.5rem; flex-wrap: wrap;
+}
+.loc-btn {
+  flex: 1; min-width: 200px;
+  border: 2px solid var(--border2); border-radius: 16px;
+  background: var(--surface); padding: 1.5rem;
+  cursor: pointer; text-align: center;
+  transition: all 0.25s; font-family: 'Tajawal', sans-serif;
+  color: var(--text2); display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.loc-btn:hover { border-color: var(--sage); background: var(--surface2); }
+.loc-btn.active { border-color: var(--sage); background: var(--sage); color: white; }
+.loc-btn.active .loc-sub { color: rgba(255,255,255,0.75); }
+.loc-icon { font-size: 2.2rem; line-height: 1; }
+.loc-title { font-size: 1.1rem; font-weight: 700; }
+.loc-sub { font-size: 12px; color: var(--text3); }
+
+.workout-content { display: none; }
+.workout-content.active { display: block; }
+
+/* Week plan strip */
+.week-strip { display: flex; gap: 6px; margin-bottom: 1.8rem; flex-wrap: wrap; }
+.wday-btn {
+  flex: 1; min-width: 80px; padding: 10px 6px; border-radius: 12px;
+  border: 1.5px solid var(--border2); background: var(--surface);
+  cursor: pointer; text-align: center; font-family: 'Tajawal', sans-serif;
+  transition: all 0.2s; color: var(--text2);
+}
+.wday-btn:hover { border-color: var(--sage); color: var(--sage); }
+.wday-btn.active { background: var(--sage); border-color: var(--sage); color: white; }
+.wday-btn .wd-name { font-size: 13px; font-weight: 600; }
+.wday-btn .wd-tag { font-size: 10px; opacity: 0.75; margin-top: 2px; }
+
+.workout-day-plan { display: none; }
+.workout-day-plan.active { display: block; }
+
+/* Workout header bar */
+.workout-header-bar {
+  background: var(--hero-bg); border-radius: 16px; padding: 1.5rem 2rem;
+  display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem;
+  position: relative; overflow: hidden;
+}
+.workout-header-bar::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(58,125,74,0.35) 0%, transparent 65%);
+}
+.whb-icon { font-size: 2.4rem; position: relative; }
+.whb-info { position: relative; flex: 1; }
+.whb-title { font-family:'Cairo',sans-serif; font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 4px; }
+.whb-meta { font-size: 12px; color: rgba(255,255,255,0.5); display: flex; gap: 16px; }
+.whb-badge {
+  position: relative; display: flex; flex-direction: column; gap: 6px; align-items: flex-start;
+}
+.whb-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.pill-burn { background: rgba(226,75,74,0.2); color: #f08080; border: 1px solid rgba(226,75,74,0.3); }
+.pill-time { background: rgba(90,171,106,0.2); color: #7acc88; border: 1px solid rgba(90,171,106,0.3); }
+.pill-rest { background: rgba(90,130,200,0.2); color: #8ab0f0; border: 1px solid rgba(90,130,200,0.3); }
+
+/* Exercise grid */
+.exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+.ex-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  overflow: hidden; transition: all 0.2s; cursor: pointer;
+}
+.ex-card:hover { box-shadow: var(--card-shadow); border-color: var(--border2); transform: translateY(-2px); }
+.ex-card.expanded { border-color: var(--sage); }
+
+.ex-card-head {
+  padding: 1rem 1.2rem; display: flex; align-items: center; gap: 12px;
+  background: var(--surface2);
+}
+.ex-num {
+  width: 32px; height: 32px; border-radius: 8px; background: var(--sage);
+  color: white; font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ex-name { font-weight: 700; color: var(--text); font-size: 0.95rem; flex: 1; }
+.ex-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.ex-toggle { color: var(--text3); font-size: 1.2rem; transition: transform 0.3s; }
+.ex-card.expanded .ex-toggle { transform: rotate(180deg); }
+
+.ex-body { display: none; padding: 1rem 1.2rem; border-top: 1px solid var(--border); }
+.ex-card.expanded .ex-body { display: block; }
+
+/* Animated gif placeholder / muscle diagram */
+.ex-anim {
+  width: 100%; height: 140px; border-radius: 10px; margin-bottom: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem; position: relative; overflow: hidden;
+  background: var(--surface3);
+}
+.ex-anim-pulse {
+  animation: exPulse 2s ease-in-out infinite;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+@keyframes exPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.ex-anim-label { font-size: 11px; color: var(--text3); font-weight: 600; }
+
+.steps-list { list-style: none; margin-bottom: 1rem; }
+.steps-list li {
+  display: flex; gap: 10px; font-size: 13px; color: var(--text);
+  padding: 7px 0; border-bottom: 1px solid var(--border); align-items: flex-start; line-height: 1.5;
+}
+.steps-list li:last-child { border-bottom: none; }
+.step-n {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--sage); color: white; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.muscles-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.muscle-tag {
+  background: var(--surface3); color: var(--sage);
+  font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+/* Rest day card */
+.rest-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 2.5rem; text-align: center;
+}
+.rest-card .rest-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+.rest-card h3 { font-family:'Cairo',sans-serif; color: var(--text); font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+.rest-card p { color: var(--text3); font-size: 14px; line-height: 1.6; }
+
+/* Timer */
+.set-timer {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface3); border-radius: 10px; padding: 10px 14px;
+  margin-top: 10px;
+}
+.set-timer-label { font-size: 12px; color: var(--text2); font-weight: 600; }
+.timer-btn {
+  background: var(--sage); color: white; border: none; border-radius: 8px;
+  padding: 6px 14px; font-family:'Tajawal',sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.2s;
+}
+.timer-btn:hover { opacity: 0.85; }
+.timer-display { font-size: 1rem; font-weight: 700; color: var(--sage); min-width: 40px; text-align: center; }
+
+/* Summary bar */
+.workout-summary {
+  display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.ws-card {
+  flex: 1; min-width: 100px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.9rem; text-align: center;
+}
+.ws-val { font-size: 1.4rem; font-weight: 700; color: var(--sage); }
+.ws-lbl { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+@media(max-width:600px){
+  .location-picker { flex-direction: column; }
+  .week-strip { gap: 4px; }
+  .wday-btn { min-width: 60px; padding: 8px 4px; }
+  .exercise-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp { from { opacity:0; transform: translateY(18px); } to { opacity:1; transform:none; } }
+@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+.fade-in { opacity:0; transform: translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
+.fade-in.visible { opacity:1; transform:none; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .bmi-grid { grid-template-columns: 1fr; }
+  .tips-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { flex-direction: column; gap: 0; }
+  .hero-stat { border-left: none; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0.9rem 1.4rem; }
+  .nav-links { display: none; }
+  section { padding: 3rem 0; }
+}
+@media (max-width: 480px) {
+  .tips-grid { grid-template-columns: 1fr; }
+  .info-cards { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" onclick="toggleTheme()" title="تبديل المظهر" id="themeBtn">🌙</button>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">تعديل البيانات</div>
+
+    <div class="field-group">
+      <label class="field-label">الاسم</label>
+      <input type="text" class="name-input" id="inp-name" placeholder="الاسم">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">العمر (سنة)</label>
+      <div class="field-row">
+        <button class="step-btn" onclick="step('age',-1)">−</button>
+        <input type="number" class="field-input" id="inp-age" min="10" max="100">
+        <button class="step-btn" onclick="step('age',1)">+</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">الطول (سم)</label>
+      <div class="field-row">
+        <button class="step-btn" onclick="step('height',-1)">−</button>
+        <input type="number" class="field-input" id="inp-height" min="120" max="220">
+        <button class="step-btn" onclick="step('height',1)">+</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">الوزن الحالي (كغ)</label>
+      <div class="field-row">
+        <button class="step-btn" onclick="step('weight',-0.5)">−</button>
+        <input type="number" class="field-input" id="inp-weight" min="30" max="200" step="0.5">
+        <button class="step-btn" onclick="step('weight',0.5)">+</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveProfile()">✓ حفظ التحديثات</button>
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🌿 برنامج صحي مخصص</div>
+  <h1>خطة <span id="hero-name">حمده</span><br>الغذائية</h1>
+  <p class="hero-sub">برنامج غذائي أسبوعي متكامل مصمم خصيصاً لتحقيق الوزن المثالي</p>
+
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="hero-stat-val" id="stat-age">28</span><span class="hero-stat-label">العمر</span></div>
+    <div class="hero-stat"><span class="hero-stat-val" id="stat-height">149 سم</span><span class="hero-stat-label">الطول</span></div>
+    <div class="hero-stat"><span class="hero-stat-val" id="stat-weight">65 كغ</span><span class="hero-stat-label">الوزن الحالي</span></div>
+    <div class="hero-stat"><span class="hero-stat-val" id="stat-bmi" style="color:#d4aa40">29.3</span><span class="hero-stat-label">BMI</span></div>
+  </div>
+
+  <button class="hero-edit-btn" onclick="openModal()">✏️ تعديل بياناتي</button>
+
+  <div class="scroll-hint">
+    <span>تصفح للأسفل</span>
+    <div class="scroll-dot"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">🌿 <span id="nav-name">خطة حمده</span></div>
+    <ul class="nav-links">
+      <li><a href="#bmi">التحليل</a></li>
+      <li><a href="#meals">الوجبات</a></li>
+      <li><a href="#weekly">الأسبوعي</a></li>
+      <li><a href="#tips">النصائح</a></li>
+      <li><a href="#workout">التمارين</a></li>
+    </ul>
+    <button class="edit-btn-nav" onclick="openModal()">✏️ تعديل البيانات</button>
+  </div>
+</nav>
+
+<!-- BMI -->
+<section id="bmi">
+  <div class="container">
+    <div class="section-label">التحليل الصحي</div>
+    <h2 class="section-title">مؤشر كتلة الجسم والأهداف</h2>
+    <p class="section-desc">تحديث فوري للمؤشرات عند تغيير بياناتك</p>
+
+    <div class="bmi-grid fade-in">
+      <div class="bmi-visual">
+        <div class="bmi-number" id="bmi-num">29.3</div>
+        <div class="bmi-unit">مؤشر كتلة الجسم (BMI)</div>
+        <div class="bmi-status-pill status-overweight" id="bmi-pill">⚠ زيادة وزن</div>
+        <div class="bmi-bar-wrap">
+          <div class="bmi-bar"><div class="bmi-needle" id="bmi-needle" style="right:36%"></div></div>
+          <div class="bmi-bar-labels"><span>نحافة</span><span>طبيعي</span><span>زيادة</span><span>سمنة</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-card-label">الوزن المستهدف</div>
+            <div class="info-card-val" id="target-weight">54–58 كغ</div>
+            <div class="info-card-sub">ضمن النطاق المثالي</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">الفارق المطلوب</div>
+            <div class="info-card-val" id="weight-diff">7–11 كغ</div>
+            <div class="info-card-sub">يُحقَّق في 3–5 أشهر</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">الخسارة الأسبوعية</div>
+            <div class="info-card-val">0.5 كغ</div>
+            <div class="info-card-sub">المعدل الصحي المثالي</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-label">BMI المستهدف</div>
+            <div class="info-card-val" id="target-bmi">22.4</div>
+            <div class="info-card-sub">نطاق الوزن الطبيعي</div>
+          </div>
+          <div class="calories-card">
+            <div>
+              <div class="num" id="cal-total">1,400</div>
+              <div class="lbl">سعرة حرارية يومياً</div>
+            </div>
+            <div class="calories-split">
+              <div class="cal-item"><div class="v" id="macro-p">105غ</div><div class="l">بروتين</div></div>
+              <div class="cal-item"><div class="v" id="macro-c">140غ</div><div class="l">كربوهيدرات</div></div>
+              <div class="cal-item"><div class="v" id="macro-f">47غ</div><div class="l">دهون</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MEALS -->
+<section id="meals">
+  <div class="container">
+    <div class="section-label">الخطة اليومية</div>
+    <h2 class="section-title">جدول الوجبات</h2>
+    <p class="section-desc">5 وجبات يومياً موزعة بشكل مثالي لتثبيت مستوى السكر وتقليل الجوع</p>
+
+    <div class="meal-tabs">
+      <button class="meal-tab active" onclick="showDay('sat',this)">السبت</button>
+      <button class="meal-tab" onclick="showDay('sun',this)">الأحد</button>
+      <button class="meal-tab" onclick="showDay('mon',this)">الاثنين</button>
+      <button class="meal-tab" onclick="showDay('tue',this)">الثلاثاء</button>
+      <button class="meal-tab" onclick="showDay('wed',this)">الأربعاء</button>
+      <button class="meal-tab" onclick="showDay('thu',this)">الخميس</button>
+      <button class="meal-tab" onclick="showDay('fri',this)">الجمعة</button>
+    </div>
+
+    <!-- SAT -->
+    <div class="day-plan active" id="day-sat">
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌅</div><div><div class="meal-title">الإفطار</div><div class="meal-time">7:00 – 8:00 ص</div></div><div class="meal-cals">320 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>بيض مسلوق</td><td>2 بيضة</td><td>140</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خبز أسمر</td><td>شريحة</td><td>80</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>خيار وطماطم</td><td>وعاء صغير</td><td>30</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>زيت زيتون</td><td>ملعقة صغيرة</td><td>45</td><td><span class="tag tag-fat">دهون صحية</span></td></tr><tr><td>شاي أخضر</td><td>كوب</td><td>0</td><td><span class="tag tag-veg">مشروب</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍎</div><div><div class="meal-title">وجبة خفيفة صباحية</div><div class="meal-time">10:30 ص</div></div><div class="meal-cals">120 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>تفاحة</td><td>حبة</td><td>80</td><td><span class="tag tag-carb">فاكهة</span></td></tr><tr><td>لوز طبيعي</td><td>10 حبات</td><td>70</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍽️</div><div><div class="meal-title">الغداء</div><div class="meal-time">1:00 – 2:00 ظ</div></div><div class="meal-cals">480 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>صدر دجاج مشوي</td><td>150 غ</td><td>210</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>أرز بسمتي مسلوق</td><td>½ كوب مطبوخ</td><td>110</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>سلطة خضراء</td><td>وعاء كبير</td><td>60</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>زيت زيتون</td><td>ملعقة كبيرة</td><td>90</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🥛</div><div><div class="meal-title">وجبة خفيفة مسائية</div><div class="meal-time">4:30 ع</div></div><div class="meal-cals">130 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>لبن قليل الدسم</td><td>كوب</td><td>100</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خيار مقطع</td><td>½ خيارة</td><td>15</td><td><span class="tag tag-veg">خضار</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌙</div><div><div class="meal-title">العشاء</div><div class="meal-time">7:30 – 8:30 م</div></div><div class="meal-cals">350 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>سمك مشوي</td><td>150 غ</td><td>180</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خضار مطبوخة (كوسا، جزر)</td><td>وعاء متوسط</td><td>80</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>شوربة عدس</td><td>كوب صغير</td><td>90</td><td><span class="tag tag-carb">بقوليات</span></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- SUN -->
+    <div class="day-plan" id="day-sun">
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌅</div><div><div class="meal-title">الإفطار</div><div class="meal-time">7:00 ص</div></div><div class="meal-cals">310 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>شوفان بالحليب</td><td>½ كوب شوفان</td><td>200</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>موز</td><td>½ موزة</td><td>50</td><td><span class="tag tag-carb">فاكهة</span></td></tr><tr><td>قرفة وشاي أخضر</td><td>رشة + كوب</td><td>5</td><td><span class="tag tag-veg">توابل</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍊</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">10:30 ص</div></div><div class="meal-cals">110 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>برتقالة</td><td>حبة</td><td>65</td><td><span class="tag tag-carb">فاكهة</span></td></tr><tr><td>جوز</td><td>3 حبات</td><td>60</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍽️</div><div><div class="meal-title">الغداء</div><div class="meal-time">1:00 ظ</div></div><div class="meal-cals">500 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>لحم بقري مشوي</td><td>120 غ</td><td>220</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>بطاطا مسلوقة</td><td>حبة صغيرة</td><td>130</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>سلطة فتوش</td><td>وعاء متوسط</td><td>80</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>زيت زيتون</td><td>ملعقة صغيرة</td><td>45</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🫐</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">4:30 ع</div></div><div class="meal-cals">140 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>زبادي يوناني</td><td>100 غ</td><td>100</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>فراولة</td><td>حفنة</td><td>40</td><td><span class="tag tag-carb">فاكهة</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌙</div><div><div class="meal-title">العشاء</div><div class="meal-time">7:30 م</div></div><div class="meal-cals">340 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>شوربة دجاج بالخضار</td><td>وعاء كبير</td><td>180</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خبز أسمر</td><td>شريحة</td><td>80</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>سلطة خيار</td><td>وعاء صغير</td><td>20</td><td><span class="tag tag-veg">خضار</span></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- MON -->
+    <div class="day-plan" id="day-mon">
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌅</div><div><div class="meal-title">الإفطار</div><div class="meal-time">7:00 ص</div></div><div class="meal-cals">295 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>لبنة قليلة الدسم</td><td>3 ملاعق</td><td>90</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خبز أسمر</td><td>شريحتان</td><td>160</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>زيتون + خيار + نعناع</td><td>5 حبات + شرائح</td><td>45</td><td><span class="tag tag-fat">مشكل</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍇</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">10:30 ص</div></div><div class="meal-cals">110 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>عنب</td><td>15 حبة</td><td>50</td><td><span class="tag tag-carb">فاكهة</span></td></tr><tr><td>جبنة قريش</td><td>2 ملاعق</td><td>60</td><td><span class="tag tag-protein">بروتين</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍽️</div><div><div class="meal-title">الغداء</div><div class="meal-time">1:00 ظ</div></div><div class="meal-cals">490 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>سلمون مشوي</td><td>150 غ</td><td>230</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>كينوا مطبوخة</td><td>½ كوب</td><td>110</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>بروكلي مطبوخ</td><td>كوب</td><td>55</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>زيت زيتون</td><td>ملعقة كبيرة</td><td>90</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍓</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">4:30 ع</div></div><div class="meal-cals">110 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>زبادي سادة</td><td>كوب</td><td>90</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>عسل</td><td>ملعقة صغيرة</td><td>20</td><td><span class="tag tag-carb">طبيعي</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌙</div><div><div class="meal-title">العشاء</div><div class="meal-time">7:30 م</div></div><div class="meal-cals">370 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>عدس مطبوخ</td><td>كوب</td><td>230</td><td><span class="tag tag-protein">بقوليات</span></td></tr><tr><td>سلطة خضراء</td><td>وعاء كبير</td><td>60</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>خبز أسمر</td><td>شريحة</td><td>80</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- TUE -->
+    <div class="day-plan" id="day-tue">
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌅</div><div><div class="meal-title">الإفطار</div><div class="meal-time">7:00 ص</div></div><div class="meal-cals">330 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>بيض مقلي بالزيت النباتي</td><td>2 بيضة</td><td>190</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خبز أسمر</td><td>شريحة</td><td>80</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>طماطم وخيار</td><td>وعاء</td><td>30</td><td><span class="tag tag-veg">خضار</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍎</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">10:30 ص</div></div><div class="meal-cals">90 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>تفاحة صغيرة</td><td>حبة</td><td>70</td><td><span class="tag tag-carb">فاكهة</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍽️</div><div><div class="meal-title">الغداء</div><div class="meal-time">1:00 ظ</div></div><div class="meal-cals">510 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>دجاج مطبوخ بالخضار</td><td>150 غ دجاج</td><td>240</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خضار متنوعة</td><td>كوب مطبوخ</td><td>90</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>أرز</td><td>½ كوب</td><td>110</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>زيت زيتون</td><td>ملعقة</td><td>45</td><td><span class="tag tag-fat">دهون</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🥜</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">4:30 ع</div></div><div class="meal-cals">130 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>مكسرات طبيعية مشكلة</td><td>25 غ</td><td>130</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌙</div><div><div class="meal-title">العشاء</div><div class="meal-time">7:30 م</div></div><div class="meal-cals">330 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>صدر ديك رومي مشوي</td><td>120 غ</td><td>160</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خضار مشوية</td><td>وعاء</td><td>80</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>شوربة خضار</td><td>كوب</td><td>60</td><td><span class="tag tag-veg">خضار</span></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- WED -->
+    <div class="day-plan" id="day-wed">
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌅</div><div><div class="meal-title">الإفطار</div><div class="meal-time">7:00 ص</div></div><div class="meal-cals">280 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>شوفان بالتوت</td><td>½ كوب شوفان</td><td>220</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>حليب قليل الدسم</td><td>½ كوب</td><td>50</td><td><span class="tag tag-protein">بروتين</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🥕</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">10:30 ص</div></div><div class="meal-cals">110 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>جزر مع حمص</td><td>أصابع جزر + ملعقتا حمص</td><td>110</td><td><span class="tag tag-veg">خضار</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍽️</div><div><div class="meal-title">الغداء</div><div class="meal-time">1:00 ظ</div></div><div class="meal-cals">480 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>سمك مشوي</td><td>160 غ</td><td>190</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>فريكة مطبوخة</td><td>½ كوب</td><td>130</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr><tr><td>سبانخ مطبوخة</td><td>كوب</td><td>70</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>طحينة</td><td>ملعقة كبيرة</td><td>90</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍑</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">4:30 ع</div></div><div class="meal-cals">100 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>فاكهة موسمية</td><td>قطعة متوسطة</td><td>80</td><td><span class="tag tag-carb">فاكهة</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌙</div><div><div class="meal-title">العشاء</div><div class="meal-time">7:30 م</div></div><div class="meal-cals">420 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>فول مدمس</td><td>كوب</td><td>200</td><td><span class="tag tag-protein">بقوليات</span></td></tr><tr><td>بيضة مسلوقة</td><td>بيضة</td><td>70</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خبز أسمر + طماطم</td><td>شريحة + طماطم</td><td>100</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- THU -->
+    <div class="day-plan" id="day-thu">
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌅</div><div><div class="meal-title">الإفطار</div><div class="meal-time">7:00 ص</div></div><div class="meal-cals">320 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>سموذي (سبانخ + موز + حليب)</td><td>كوب كبير</td><td>220</td><td><span class="tag tag-veg">خضار وفاكهة</span></td></tr><tr><td>بيضة مسلوقة</td><td>بيضة</td><td>70</td><td><span class="tag tag-protein">بروتين</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌴</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">10:30 ص</div></div><div class="meal-cals">120 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>تمر</td><td>3 حبات</td><td>60</td><td><span class="tag tag-carb">طبيعي</span></td></tr><tr><td>لوز</td><td>10 حبات</td><td>70</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍽️</div><div><div class="meal-title">الغداء</div><div class="meal-time">1:00 ظ</div></div><div class="meal-cals">480 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>مندي دجاج خفيف الدهن</td><td>قطعة + أرز ½ كوب</td><td>350</td><td><span class="tag tag-protein">بروتين + كربوهيدرات</span></td></tr><tr><td>سلطة الدهينة</td><td>ملعقة كبيرة</td><td>90</td><td><span class="tag tag-fat">دهون</span></td></tr><tr><td>خضار جانبية</td><td>وعاء</td><td>40</td><td><span class="tag tag-veg">خضار</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🥛</div><div><div class="meal-title">وجبة خفيفة</div><div class="meal-time">4:30 ع</div></div><div class="meal-cals">100 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>لبن</td><td>كوب</td><td>100</td><td><span class="tag tag-protein">بروتين</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌙</div><div><div class="meal-title">العشاء</div><div class="meal-time">7:30 م</div></div><div class="meal-cals">360 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>دجاج بالخضار مشوي</td><td>120 غ دجاج</td><td>230</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>شوربة طماطم</td><td>كوب</td><td>80</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>خبز أسمر</td><td>شريحة</td><td>80</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- FRI -->
+    <div class="day-plan" id="day-fri">
+      <div style="background:var(--warn-bg);border-radius:12px;padding:1.2rem;margin-bottom:1rem;border:1px solid var(--warn-border);">
+        <div style="font-weight:700;color:var(--sand-text);margin-bottom:4px;">🎉 الجمعة — يوم المرونة</div>
+        <div style="font-size:13px;color:var(--text3);">يوم أكثر مرونة لتجمعات العائلة. حافظي على التوازن العام!</div>
+      </div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌅</div><div><div class="meal-title">الإفطار</div><div class="meal-time">8:00 ص</div></div><div class="meal-cals">400 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>بيض مع جبنة قليلة الدسم</td><td>2 بيضة + 30 غ جبنة</td><td>240</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>خبز أسمر</td><td>شريحتان</td><td>160</td><td><span class="tag tag-carb">كربوهيدرات</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🍽️</div><div><div class="meal-title">الغداء العائلي</div><div class="meal-time">1:30 ظ</div></div><div class="meal-cals">600 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>طبق عائلي (دجاج/لحم + أرز)</td><td>حصة متوسطة</td><td>450</td><td><span class="tag tag-protein">مشكل</span></td></tr><tr><td>سلطة</td><td>وعاء</td><td>80</td><td><span class="tag tag-veg">خضار</span></td></tr><tr><td>عصير طبيعي</td><td>كوب</td><td>60</td><td><span class="tag tag-carb">مشروب</span></td></tr></tbody></table></div></div>
+      <div class="meal-card"><div class="meal-header"><div class="meal-icon">🌙</div><div><div class="meal-title">العشاء</div><div class="meal-time">7:30 م</div></div><div class="meal-cals">280 سعرة</div></div><div class="meal-body"><table class="food-table"><thead><tr><th>الوجبة</th><th>الكمية</th><th>السعرات</th><th>النوع</th></tr></thead><tbody><tr><td>سلطة تونة كبيرة</td><td>وعاء + علبة تونة</td><td>220</td><td><span class="tag tag-protein">بروتين</span></td></tr><tr><td>زيت زيتون وليمون</td><td>ملعقة</td><td>50</td><td><span class="tag tag-fat">دهون صحية</span></td></tr></tbody></table></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WEEKLY -->
+<section id="weekly">
+  <div class="container">
+    <div class="section-label">نظرة عامة</div>
+    <h2 class="section-title">الجدول الأسبوعي الكامل</h2>
+    <p class="section-desc">ملخص شامل للأيام السبعة</p>
+    <div class="fade-in" style="overflow-x:auto;">
+      <table class="weekly-table">
+        <thead><tr><th style="width:80px">اليوم</th><th>الإفطار</th><th>وجبة خفيفة</th><th>الغداء</th><th>وجبة خفيفة</th><th>العشاء</th><th style="text-align:center">المجموع</th></tr></thead>
+        <tbody>
+          <tr><td><span class="day-badge">السبت</span></td><td>بيض + خبز أسمر + خيار</td><td>تفاحة + لوز</td><td>دجاج مشوي + أرز + سلطة</td><td>لبن + خيار</td><td>سمك + خضار + عدس</td><td style="text-align:center"><span class="cal-badge">1,400</span></td></tr>
+          <tr><td><span class="day-badge">الأحد</span></td><td>شوفان + موز</td><td>برتقالة + جوز</td><td>لحم مشوي + بطاطا + سلطة</td><td>زبادي + فراولة</td><td>شوربة دجاج + خبز</td><td style="text-align:center"><span class="cal-badge">1,390</span></td></tr>
+          <tr><td><span class="day-badge">الاثنين</span></td><td>لبنة + خبز + زيتون</td><td>عنب + جبنة قريش</td><td>سلمون + كينوا + بروكلي</td><td>زبادي + عسل</td><td>عدس + سلطة + خبز</td><td style="text-align:center"><span class="cal-badge">1,380</span></td></tr>
+          <tr><td><span class="day-badge">الثلاثاء</span></td><td>بيض مقلي + خبز</td><td>تفاحة</td><td>دجاج بالخضار + أرز</td><td>مكسرات طبيعية</td><td>ديك رومي + خضار</td><td style="text-align:center"><span class="cal-badge">1,390</span></td></tr>
+          <tr><td><span class="day-badge">الأربعاء</span></td><td>شوفان بالتوت</td><td>جزر + حمص</td><td>سمك + فريكة + سبانخ</td><td>فاكهة موسمية</td><td>فول + بيض + خبز</td><td style="text-align:center"><span class="cal-badge">1,390</span></td></tr>
+          <tr><td><span class="day-badge">الخميس</span></td><td>سموذي + بيضة</td><td>تمر + لوز</td><td>مندي دجاج + سلطة</td><td>لبن</td><td>دجاج مشوي + شوربة</td><td style="text-align:center"><span class="cal-badge">1,380</span></td></tr>
+          <tr style="background:var(--warn-bg)"><td><span class="day-badge" style="background:var(--sand);color:#3a2000">الجمعة</span></td><td>بيض + جبنة + خبز</td><td>—</td><td>غداء عائلي متوازن</td><td>—</td><td>سلطة تونة كبيرة</td><td style="text-align:center"><span class="cal-badge">~1,500</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section id="tips">
+  <div class="container">
+    <div class="section-label">نصائح مهمة</div>
+    <h2 class="section-title">إرشادات لنجاح الخطة</h2>
+    <p class="section-desc">التزامك بهذه النصائح يضاعف نتائجك ويحمي صحتك</p>
+    <div class="tips-grid">
+      <div class="tip-card fade-in"><span class="tip-icon">💧</span><div class="tip-title">اشربي الماء كافياً</div><div class="tip-text">8 أكواب يومياً على الأقل. اشربي كوباً قبل كل وجبة بـ 20 دقيقة.</div></div>
+      <div class="tip-card fade-in"><span class="tip-icon">🚶‍♀️</span><div class="tip-title">النشاط البدني اليومي</div><div class="tip-text">30 دقيقة مشي سريع يومياً تحرق 150–200 سعرة إضافية وتحسن المزاج.</div></div>
+      <div class="tip-card fade-in"><span class="tip-icon">⏰</span><div class="tip-title">انتظامي في الوجبات</div><div class="tip-text">لا تتخطي وجبة الإفطار. الانتظام يضبط هرمونات الجوع ويمنع الشراهة.</div></div>
+      <div class="tip-card fade-in"><span class="tip-icon">😴</span><div class="tip-title">نوم كافٍ وعميق</div><div class="tip-text">7–8 ساعات نوم ضرورية. قلة النوم ترفع هرمون الجوع وتصعّب الحمية.</div></div>
+      <div class="tip-card fade-in"><span class="tip-icon">📏</span><div class="tip-title">راقبي التقدم أسبوعياً</div><div class="tip-text">زني نفسك مرة أسبوعياً صباحاً قبل الأكل للحصول على قراءة دقيقة.</div></div>
+      <div class="tip-card fade-in"><span class="tip-icon">🧘‍♀️</span><div class="tip-title">تجنبي التوتر الزائد</div><div class="tip-text">التوتر يرفع الكورتيزول الذي يزيد تخزين الدهون. تنفسي بعمق 5 دقائق يومياً.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WORKOUT SECTION ===== -->
+<section id="workout">
+  <div class="container">
+    <div class="section-label">النشاط البدني</div>
+    <h2 class="section-title">برنامج التمارين الأسبوعي</h2>
+    <p class="section-desc">اختاري مكان تمرينك وابدئي — البرنامج مصمم خصيصاً لهدف خسارة الوزن وشد الجسم</p>
+
+    <!-- Location Picker -->
+    <div class="location-picker">
+      <button class="loc-btn active" id="loc-home" onclick="switchLocation('home')">
+        <div class="loc-icon">🏠</div>
+        <div class="loc-title">تمارين البيت</div>
+        <div class="loc-sub">بدون أجهزة — في راحتك</div>
+      </button>
+      <button class="loc-btn" id="loc-gym" onclick="switchLocation('gym')">
+        <div class="loc-icon">🏋️‍♀️</div>
+        <div class="loc-title">تمارين الجيم</div>
+        <div class="loc-sub">مع الأجهزة — نتائج أسرع</div>
+      </button>
+    </div>
+
+    <!-- ===== HOME WORKOUT ===== -->
+    <div class="workout-content active" id="wc-home">
+
+      <div class="week-strip">
+        <button class="wday-btn active" onclick="switchWDay('home','sat',this)"><div class="wd-name">السبت</div><div class="wd-tag">كارديو</div></button>
+        <button class="wday-btn" onclick="switchWDay('home','sun',this)"><div class="wd-name">الأحد</div><div class="wd-tag">جذع علوي</div></button>
+        <button class="wday-btn" onclick="switchWDay('home','mon',this)"><div class="wd-name">الاثنين</div><div class="wd-tag">استراحة</div></button>
+        <button class="wday-btn" onclick="switchWDay('home','tue',this)"><div class="wd-name">الثلاثاء</div><div class="wd-tag">أرجل</div></button>
+        <button class="wday-btn" onclick="switchWDay('home','wed',this)"><div class="wd-name">الأربعاء</div><div class="wd-tag">كور</div></button>
+        <button class="wday-btn" onclick="switchWDay('home','thu',this)"><div class="wd-name">الخميس</div><div class="wd-tag">كامل</div></button>
+        <button class="wday-btn" onclick="switchWDay('home','fri',this)"><div class="wd-name">الجمعة</div><div class="wd-tag">استراحة</div></button>
+      </div>
+
+      <!-- SAT - Cardio -->
+      <div class="workout-day-plan active" id="whome-sat">
+        <div class="workout-header-bar">
+          <div class="whb-icon">🔥</div>
+          <div class="whb-info">
+            <div class="whb-title">السبت — كارديو وحرق دهون</div>
+            <div class="whb-meta"><span>📍 البيت</span><span>⏱ 40 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 250–300 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 40 دقيقة</span>
+          </div>
+        </div>
+        <div class="workout-summary">
+          <div class="ws-card"><div class="ws-val">6</div><div class="ws-lbl">تمارين</div></div>
+          <div class="ws-card"><div class="ws-val">40</div><div class="ws-lbl">دقيقة</div></div>
+          <div class="ws-card"><div class="ws-val">~280</div><div class="ws-lbl">سعرة محروقة</div></div>
+          <div class="ws-card"><div class="ws-val">بدون</div><div class="ws-lbl">أجهزة</div></div>
+        </div>
+        <div class="exercise-grid">
+
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">مشي سريع في المكان</div><div class="ex-meta">5 دقائق — إحماء</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🚶‍♀️</div><div class="ex-anim-label">إحماء</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي مستقيمة وذراعاك جانبك</li>
+                <li><div class="step-n">2</div>ارفعي ركبتيك تناوباً بسرعة متوسطة</li>
+                <li><div class="step-n">3</div>حركي ذراعيك للأمام والخلف بالتزامن</li>
+                <li><div class="step-n">4</div>استمري 5 دقائق كاملة</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">ساقان</span><span class="muscle-tag">قلب</span><span class="muscle-tag">إحماء عام</span></div>
+            </div>
+          </div>
+
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">جمبينج جاك</div><div class="ex-meta">3 جولات × 30 ثانية</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🤸‍♀️</div><div class="ex-anim-label">3 × 30 ثانية</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي مستقيمة وقدماك معاً وذراعاك بجانبك</li>
+                <li><div class="step-n">2</div>اقفزي وافردي قدميك للجانبين ورفعي ذراعيك فوق رأسك</li>
+                <li><div class="step-n">3</div>اقفزي مجدداً لوضعية البداية</li>
+                <li><div class="step-n">4</div>استريحي 20 ثانية بين كل جولة</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">كامل الجسم</span><span class="muscle-tag">كارديو</span><span class="muscle-tag">تنسيق</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ مؤقت الراحة — 20 ثانية</div><div class="timer-display" id="t-h-sat-2">20</div><button class="timer-btn" onclick="startTimer('t-h-sat-2',20,event)">ابدأ</button></div>
+            </div>
+          </div>
+
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">High Knees</div><div class="ex-meta">3 جولات × 40 ثانية</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🏃‍♀️</div><div class="ex-anim-label">رفع الركبتين</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي مستقيمة ويدايك أمامك بارتفاع الخصر</li>
+                <li><div class="step-n">2</div>اركضي في مكانك برفع الركبة لتلمس اليد</li>
+                <li><div class="step-n">3</div>تناوبي بين الركبتين بأسرع ما يمكن</li>
+                <li><div class="step-n">4</div>حافظي على الظهر مستقيماً طوال الوقت</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">فخذان</span><span class="muscle-tag">بطن</span><span class="muscle-tag">كارديو عالي</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ مؤقت الراحة — 20 ثانية</div><div class="timer-display" id="t-h-sat-3">20</div><button class="timer-btn" onclick="startTimer('t-h-sat-3',20,event)">ابدأ</button></div>
+            </div>
+          </div>
+
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Mountain Climbers</div><div class="ex-meta">3 جولات × 30 ثانية</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🧗‍♀️</div><div class="ex-anim-label">تسلق الجبل</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>ابدأي بوضعية الضغط (بلانك) — يدايك أسفل الكتفين</li>
+                <li><div class="step-n">2</div>اجذبي ركبتك اليمنى نحو صدرك بسرعة</li>
+                <li><div class="step-n">3</div>أعيديها وكرري مع الركبة اليسرى</div></li>
+                <li><div class="step-n">4</div>بطنك شادة طوال التمرين</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">بطن</span><span class="muscle-tag">أكتاف</span><span class="muscle-tag">فخذان</span><span class="muscle-tag">كارديو</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ مؤقت الراحة — 30 ثانية</div><div class="timer-display" id="t-h-sat-4">30</div><button class="timer-btn" onclick="startTimer('t-h-sat-4',30,event)">ابدأ</button></div>
+            </div>
+          </div>
+
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">5</div><div style="flex:1"><div class="ex-name">Burpees المعدّل</div><div class="ex-meta">3 جولات × 10 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>💪</div><div class="ex-anim-label">بدون قفزة</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي مستقيمة ثم انحني وضعي يديك على الأرض</li>
+                <li><div class="step-n">2</div>اسحبي قدميك للخلف لوضعية البلانك</li>
+                <li><div class="step-n">3</div>أعيدي قدميك ثم قومي للوقوف</li>
+                <li><div class="step-n">4</div>النسخة السهلة: بدون قفزة في النهاية</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">كامل الجسم</span><span class="muscle-tag">حرق عالي</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ مؤقت الراحة — 45 ثانية</div><div class="timer-display" id="t-h-sat-5">45</div><button class="timer-btn" onclick="startTimer('t-h-sat-5',45,event)">ابدأ</button></div>
+            </div>
+          </div>
+
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">6</div><div style="flex:1"><div class="ex-name">تبريد — تمدد</div><div class="ex-meta">5 دقائق</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🧘‍♀️</div><div class="ex-anim-label">تبريد</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>تمدد الفخذ الأمامي: قفي وامسكي قدمك من الخلف 30 ث</li>
+                <li><div class="step-n">2</div>تمدد الكتف: اسحبي ذراعك عبر الصدر 20 ث لكل جانب</li>
+                <li><div class="step-n">3</div>تمدد البطن: انبطحي وارفعي الصدر ببطء</li>
+                <li><div class="step-n">4</div>تنفسي بعمق وببطء خلال كل تمدد</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">مرونة</span><span class="muscle-tag">تعافي</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUN - Upper -->
+      <div class="workout-day-plan" id="whome-sun">
+        <div class="workout-header-bar">
+          <div class="whb-icon">💪</div>
+          <div class="whb-info">
+            <div class="whb-title">الأحد — جذع علوي وذراعان</div>
+            <div class="whb-meta"><span>📍 البيت</span><span>⏱ 35 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 180–220 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 35 دقيقة</span>
+          </div>
+        </div>
+        <div class="workout-summary">
+          <div class="ws-card"><div class="ws-val">5</div><div class="ws-lbl">تمارين</div></div>
+          <div class="ws-card"><div class="ws-val">35</div><div class="ws-lbl">دقيقة</div></div>
+          <div class="ws-card"><div class="ws-val">~200</div><div class="ws-lbl">سعرة محروقة</div></div>
+          <div class="ws-card"><div class="ws-val">بدون</div><div class="ws-lbl">أجهزة</div></div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">ضغط معدّل (ركبتان)</div><div class="ex-meta">3 جولات × 10–12 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🤸‍♀️</div><div class="ex-anim-label">Push-Up معدّل</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>انبطحي مع وضع الركبتين على الأرض</li>
+                <li><div class="step-n">2</div>يداك أعرض من الكتفين قليلاً</li>
+                <li><div class="step-n">3</div>انزلي ببطء حتى يلامس صدرك الأرض تقريباً</li>
+                <li><div class="step-n">4</div>ارفعي مع إبقاء الجسم مستقيماً من الركبة للرأس</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">صدر</span><span class="muscle-tag">أكتاف</span><span class="muscle-tag">ترايسبس</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة بين الجولات — 45 ثانية</div><div class="timer-display" id="t-h-sun-1">45</div><button class="timer-btn" onclick="startTimer('t-h-sun-1',45,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Tricep Dips على كرسي</div><div class="ex-meta">3 جولات × 12 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🪑</div><div class="ex-anim-label">ترايسبس</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>اجلسي على حافة كرسي ثابت وضعي يديك بجانب فخذيك</li>
+                <li><div class="step-n">2</div>تحركي للأمام حتى مؤخرتك معلقة أمام الكرسي</li>
+                <li><div class="step-n">3</div>انزلي بثني المرفقين للخلف حتى 90 درجة</li>
+                <li><div class="step-n">4</div>ارفعي بدفع الذراعين — ظهرك قريب من الكرسي</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">ترايسبس</span><span class="muscle-tag">أكتاف أمامية</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-h-sun-2">45</div><button class="timer-btn" onclick="startTimer('t-h-sun-2',45,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Superman</div><div class="ex-meta">3 جولات × 15 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🦸‍♀️</div><div class="ex-anim-label">ظهر سفلي</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>انبطحي على بطنك ومدي ذراعيك أمامك</li>
+                <li><div class="step-n">2</div>ارفعي الذراعين والساقين معاً في آن واحد</li>
+                <li><div class="step-n">3</div>أمسكي الوضعية ثانية واحدة ثم انزلي</li>
+                <li><div class="step-n">4</div>شدي عضلات المؤخرة خلال الرفع</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">ظهر سفلي</span><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">أكتاف</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 30 ثانية</div><div class="timer-display" id="t-h-sun-3">30</div><button class="timer-btn" onclick="startTimer('t-h-sun-3',30,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Wall Push بالجدار</div><div class="ex-meta">3 جولات × 15 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🏠</div><div class="ex-anim-label">أسهل من الضغط</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي على بعد ذراع من الجدار</li>
+                <li><div class="step-n">2</div>ضعي يديك على الجدار بعرض الكتفين</li>
+                <li><div class="step-n">3</div>انحني للأمام حتى يقترب أنفك من الجدار ببطء</li>
+                <li><div class="step-n">4</div>ادفعي للخلف — ممتازة للمبتدئات</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">صدر</span><span class="muscle-tag">أكتاف</span><span class="muscle-tag">مناسبة للمبتدئات</span></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">5</div><div style="flex:1"><div class="ex-name">Plank ثابت</div><div class="ex-meta">3 جولات × 20–30 ثانية</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🧱</div><div class="ex-anim-label">كور وثبات</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>اتكئي على ساعديك وأصابع القدم</li>
+                <li><div class="step-n">2</div>جسمك مستقيم تماماً من الرأس للعقب</li>
+                <li><div class="step-n">3</div>شدي البطن ولا تنخفضي أو ترتفعي</li>
+                <li><div class="step-n">4</div>تنفسي بشكل طبيعي خلال الوضعية</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">بطن</span><span class="muscle-tag">ظهر</span><span class="muscle-tag">أكتاف</span><span class="muscle-tag">كور</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ مؤقت البلانك — 30 ثانية</div><div class="timer-display" id="t-h-sun-5">30</div><button class="timer-btn" onclick="startTimer('t-h-sun-5',30,event)">ابدأ</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MON - Rest -->
+      <div class="workout-day-plan" id="whome-mon">
+        <div class="rest-card"><span class="rest-icon">😴</span><h3>الاثنين — يوم الراحة</h3><p>جسمك يحتاج للتعافي بين أيام التمرين. استريحي واشربي الماء بكثرة. يمكنك المشي الهادئ 20 دقيقة إذا أردت.</p></div>
+      </div>
+
+      <!-- TUE - Legs -->
+      <div class="workout-day-plan" id="whome-tue">
+        <div class="workout-header-bar">
+          <div class="whb-icon">🦵</div>
+          <div class="whb-info">
+            <div class="whb-title">الثلاثاء — أرجل ومؤخرة</div>
+            <div class="whb-meta"><span>📍 البيت</span><span>⏱ 35 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 200–250 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 35 دقيقة</span>
+          </div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Squat أساسي</div><div class="ex-meta">4 جولات × 15 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🏋️‍♀️</div><div class="ex-anim-label">سكوات</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي وقدماك بعرض الكتفين أو أوسع قليلاً</li>
+                <li><div class="step-n">2</div>ذراعاك للأمام للتوازن، ظهرك مستقيم</li>
+                <li><div class="step-n">3</div>انزلي ببطء حتى فخذيك أفقيتان</li>
+                <li><div class="step-n">4</div>ادفعي من الكعب للوقوف — لا تكسري الركبة للداخل</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">فخذ أمامي</span><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">بتات</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-h-tue-1">45</div><button class="timer-btn" onclick="startTimer('t-h-tue-1',45,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Glute Bridge</div><div class="ex-meta">4 جولات × 15 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🌉</div><div class="ex-anim-label">جسر المؤخرة</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>استلقي على ظهرك وركبتاك مثنيتان وقدماك مسطحتان</li>
+                <li><div class="step-n">2</div>ارفعي الحوض حتى يصير جسمك خطاً مستقيماً</li>
+                <li><div class="step-n">3</div>أمسكي الوضعية ثانيتين مع شد المؤخرة بقوة</li>
+                <li><div class="step-n">4</div>انزلي ببطء ولا تلمسي الأرض بين التكرارات</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">أوتار الركبة</span><span class="muscle-tag">بطن سفلي</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 30 ثانية</div><div class="timer-display" id="t-h-tue-2">30</div><button class="timer-btn" onclick="startTimer('t-h-tue-2',30,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Reverse Lunge</div><div class="ex-meta">3 جولات × 10 لكل جانب</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🦶</div><div class="ex-anim-label">خطوة للخلف</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي مستقيمة وخطي بساقك اليمنى للخلف</li>
+                <li><div class="step-n">2</div>انزلي حتى تلمس ركبتك اليمنى الأرض تقريباً</li>
+                <li><div class="step-n">3</div>ارجعي للوضعية الابتدائية واعملي الجانب الآخر</li>
+                <li><div class="step-n">4</div>ظهرك مستقيم وركبة الأمام لا تتجاوز القدم</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">فخذ</span><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">توازن</span></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Calf Raises</div><div class="ex-meta">3 جولات × 20 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>👟</div><div class="ex-anim-label">رفع الكعب</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>قفي مستقيمة ويمكنك الإمساك بالجدار للتوازن</li>
+                <li><div class="step-n">2</div>ارفعي على أصابع القدمين ببطء حتى أقصى ارتفاع</li>
+                <li><div class="step-n">3</div>أمسكي ثانية ثم انزلي ببطء</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">ساق (بتة)</span><span class="muscle-tag">مؤخرة الساق</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WED - Core -->
+      <div class="workout-day-plan" id="whome-wed">
+        <div class="workout-header-bar">
+          <div class="whb-icon">🎯</div>
+          <div class="whb-info">
+            <div class="whb-title">الأربعاء — كور وبطن</div>
+            <div class="whb-meta"><span>📍 البيت</span><span>⏱ 30 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 150–180 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 30 دقيقة</span>
+          </div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Crunches</div><div class="ex-meta">4 جولات × 15 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>💪</div><div class="ex-anim-label">بطن علوي</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>استلقي وركبتاك مثنيتان وقدماك على الأرض</li>
+                <li><div class="step-n">2</div>ضعي يديك خلف رأسك ولا تشدي الرقبة</li>
+                <li><div class="step-n">3</div>ارفعي الكتفين فقط عن الأرض بانقباض البطن</li>
+                <li><div class="step-n">4</div>انزلي ببطء — لا تنزلي للأرض الكاملة بين التكرارات</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">بطن علوي</span><span class="muscle-tag">كور</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 30 ثانية</div><div class="timer-display" id="t-h-wed-1">30</div><button class="timer-btn" onclick="startTimer('t-h-wed-1',30,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Leg Raises</div><div class="ex-meta">3 جولات × 12 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🦵</div><div class="ex-anim-label">بطن سفلي</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>استلقي وضعي يديك تحت مؤخرتك للدعم</li>
+                <li><div class="step-n">2</div>ارفعي الساقين معاً حتى 90 درجة</li>
+                <li><div class="step-n">3</div>انزلي ببطء ولا تلمسي الأرض</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">بطن سفلي</span><span class="muscle-tag">فخذ أمامي</span></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Russian Twist</div><div class="ex-meta">3 جولات × 20 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🌀</div><div class="ex-anim-label">جانبي</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>اجلسي وركبتاك مثنيتان والجذع مائل 45 درجة</li>
+                <li><div class="step-n">2</div>شبّكي يديك أمامك وحركيهما يميناً ويساراً</li>
+                <li><div class="step-n">3</div>للصعوبة: ارفعي القدمين عن الأرض</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">بطن جانبي</span><span class="muscle-tag">خصر</span></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Side Plank</div><div class="ex-meta">3 جولات × 20 ثانية كل جانب</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>📐</div><div class="ex-anim-label">بلانك جانبي</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>اتكئي على ساعدك الأيمن والساق الأيمنى</li>
+                <li><div class="step-n">2</div>ارفعي الحوض حتى يصير جسمك خطاً مستقيماً</li>
+                <li><div class="step-n">3</div>أمسكي 20 ثانية ثم غيري الجانب</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">جانب البطن</span><span class="muscle-tag">خصر</span><span class="muscle-tag">كور</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ مؤقت — 20 ثانية</div><div class="timer-display" id="t-h-wed-4">20</div><button class="timer-btn" onclick="startTimer('t-h-wed-4',20,event)">ابدأ</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THU - Full Body -->
+      <div class="workout-day-plan" id="whome-thu">
+        <div class="workout-header-bar">
+          <div class="whb-icon">⚡</div>
+          <div class="whb-info">
+            <div class="whb-title">الخميس — تمرين كامل الجسم</div>
+            <div class="whb-meta"><span>📍 البيت</span><span>⏱ 45 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 280–350 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 45 دقيقة</span>
+          </div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Squat إلى وقفة على الأصابع</div><div class="ex-meta">3 × 12 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🔥</div><div class="ex-anim-label">سكوات + رفع</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اعملي سكوات كاملاً</li><li><div class="step-n">2</div>عند الصعود ارفعي على أصابع القدمين</li><li><div class="step-n">3</div>يربط بين عضلة الساق والفخذ في حركة واحدة</li></ul><div class="muscles-row"><span class="muscle-tag">فخذ</span><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">ساق</span></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Bear Crawl</div><div class="ex-meta">3 × 30 ثانية</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🐻</div><div class="ex-anim-label">زحف الدب</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اركعي على يديك وركبتيك — ارفعي الركبتين سنتيمترات</li><li><div class="step-n">2</div>تحركي للأمام باليد والقدم المعاكسين في آن</li><li><div class="step-n">3</div>حافظي على ظهر مستقيم وبطن شادة</li></ul><div class="muscles-row"><span class="muscle-tag">كامل الجسم</span><span class="muscle-tag">تنسيق</span><span class="muscle-tag">كور</span></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Glute Bridge + Leg Raise</div><div class="ex-meta">3 × 10 لكل جانب</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🌈</div><div class="ex-anim-label">مؤخرة + ساق</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اعملي جسر المؤخرة كالمعتاد</li><li><div class="step-n">2</div>في أعلى النقطة ارفعي ساقاً للسماء ببطء</li><li><div class="step-n">3</div>انزلي وكرري مع الجانب الآخر</li></ul><div class="muscles-row"><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">أوتار</span><span class="muscle-tag">كور</span></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Inchworm</div><div class="ex-meta">3 × 8 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🐛</div><div class="ex-anim-label">دودة القياس</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>قفي وانحني لتلمسي الأرض بيديك</li><li><div class="step-n">2</div>مشي بيديك للأمام حتى وضعية البلانك</li><li><div class="step-n">3</div>أضيفي ضغطة واحدة ثم ارجعي بالمشي على اليدين</li><li><div class="step-n">4</div>قومي ببطء واعيدي الحركة</li></ul><div class="muscles-row"><span class="muscle-tag">مرونة</span><span class="muscle-tag">صدر</span><span class="muscle-tag">ظهر</span><span class="muscle-tag">كور</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- FRI - Rest -->
+      <div class="workout-day-plan" id="whome-fri">
+        <div class="rest-card"><span class="rest-icon">🌿</span><h3>الجمعة — راحة نشطة</h3><p>يوم التجمع العائلي! مشي 20–30 دقيقة بعد الغداء يكفي. الجسم يبني العضلة في وقت الراحة.</p></div>
+      </div>
+    </div>
+
+    <!-- ===== GYM WORKOUT ===== -->
+    <div class="workout-content" id="wc-gym">
+
+      <div class="week-strip">
+        <button class="wday-btn active" onclick="switchWDay('gym','sat',this)"><div class="wd-name">السبت</div><div class="wd-tag">صدر + ترايسبس</div></button>
+        <button class="wday-btn" onclick="switchWDay('gym','sun',this)"><div class="wd-name">الأحد</div><div class="wd-tag">ظهر + بايسبس</div></button>
+        <button class="wday-btn" onclick="switchWDay('gym','mon',this)"><div class="wd-name">الاثنين</div><div class="wd-tag">استراحة</div></button>
+        <button class="wday-btn" onclick="switchWDay('gym','tue',this)"><div class="wd-name">الثلاثاء</div><div class="wd-tag">أرجل + مؤخرة</div></button>
+        <button class="wday-btn" onclick="switchWDay('gym','wed',this)"><div class="wd-name">الأربعاء</div><div class="wd-tag">كارديو + كور</div></button>
+        <button class="wday-btn" onclick="switchWDay('gym','thu',this)"><div class="wd-name">الخميس</div><div class="wd-tag">أكتاف + كامل</div></button>
+        <button class="wday-btn" onclick="switchWDay('gym','fri',this)"><div class="wd-name">الجمعة</div><div class="wd-tag">استراحة</div></button>
+      </div>
+
+      <!-- GYM SAT - Chest + Triceps -->
+      <div class="workout-day-plan active" id="wgym-sat">
+        <div class="workout-header-bar">
+          <div class="whb-icon">🏋️‍♀️</div>
+          <div class="whb-info">
+            <div class="whb-title">السبت — صدر وترايسبس</div>
+            <div class="whb-meta"><span>📍 الجيم</span><span>⏱ 50 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 250–320 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 50 دقيقة</span>
+          </div>
+        </div>
+        <div class="workout-summary">
+          <div class="ws-card"><div class="ws-val">5</div><div class="ws-lbl">تمارين</div></div>
+          <div class="ws-card"><div class="ws-val">50</div><div class="ws-lbl">دقيقة</div></div>
+          <div class="ws-card"><div class="ws-val">~290</div><div class="ws-lbl">سعرة محروقة</div></div>
+          <div class="ws-card"><div class="ws-val">أجهزة</div><div class="ws-lbl">+ حديد حر</div></div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Chest Press بالجهاز</div><div class="ex-meta">4 جولات × 12 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🏋️</div><div class="ex-anim-label">ضغط صدر جهاز</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>اضبطي الكرسي حتى المقابض بمستوى الصدر</li>
+                <li><div class="step-n">2</div>ظهرك ملتصق بالمسند — لا تقوسيه</li>
+                <li><div class="step-n">3</div>ادفعي للأمام ببطء مع زفير</li>
+                <li><div class="step-n">4</div>أعيدي ببطء أكثر (3 ثوان) مع شهيق</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">صدر</span><span class="muscle-tag">أكتاف أمامية</span><span class="muscle-tag">ترايسبس</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 60 ثانية</div><div class="timer-display" id="t-g-sat-1">60</div><button class="timer-btn" onclick="startTimer('t-g-sat-1',60,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Pec Deck (Butterfly)</div><div class="ex-meta">3 جولات × 15 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🦋</div><div class="ex-anim-label">جهاز الفراشة</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>اجلسي واضبطي المقابض بمستوى الكتفين</li>
+                <li><div class="step-n">2</div>أغلقي الذراعين أمامك ببطء — تحسسي تقلص الصدر</li>
+                <li><div class="step-n">3</div>افتحي ببطء دون أن تذهبي لما وراء الكتفين</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">صدر داخلي</span><span class="muscle-tag">صدر علوي</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-g-sat-2">45</div><button class="timer-btn" onclick="startTimer('t-g-sat-2',45,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Cable Tricep Pushdown</div><div class="ex-meta">3 جولات × 15 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>📡</div><div class="ex-anim-label">ضغط ترايسبس كابل</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>أمسكي الحبل أو البار بقبضة من الأعلى</li>
+                <li><div class="step-n">2</div>كوعاك ملتصقتان بجانبك — لا تحركيهما</li>
+                <li><div class="step-n">3</div>ادفعي لأسفل حتى تستقيم الذراعان</li>
+                <li><div class="step-n">4</div>أعيدي ببطء حتى 90 درجة</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">ترايسبس</span><span class="muscle-tag">ذراع خلفي</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-g-sat-3">45</div><button class="timer-btn" onclick="startTimer('t-g-sat-3',45,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Incline Dumbbell Press</div><div class="ex-meta">3 جولات × 10 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>⬆️</div><div class="ex-anim-label">صدر علوي</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>اضبطي البنش على 30–45 درجة</li>
+                <li><div class="step-n">2</div>أمسكي الدمبلز وذراعاك على جانبي الصدر</li>
+                <li><div class="step-n">3</div>ارفعي للأعلى حتى تقترب الدمبلز</li>
+                <li><div class="step-n">4</div>انزلي ببطء — 3 ثوانٍ نزولاً</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">صدر علوي</span><span class="muscle-tag">أكتاف</span></div>
+              <div class="set-timer"><div class="set-timer-label">⏱ راحة — 60 ثانية</div><div class="timer-display" id="t-g-sat-4">60</div><button class="timer-btn" onclick="startTimer('t-g-sat-4',60,event)">ابدأ</button></div>
+            </div>
+          </div>
+          <div class="ex-card" onclick="toggleEx(this)">
+            <div class="ex-card-head"><div class="ex-num">5</div><div style="flex:1"><div class="ex-name">Dips بالجهاز المساعد</div><div class="ex-meta">3 جولات × 10 تكرار</div></div><div class="ex-toggle">▼</div></div>
+            <div class="ex-body">
+              <div class="ex-anim"><div class="ex-anim-pulse"><div>🏅</div><div class="ex-anim-label">Assisted Dips</div></div></div>
+              <ul class="steps-list">
+                <li><div class="step-n">1</div>ركبتاك على الوسادة واليدان على المقابض</li>
+                <li><div class="step-n">2</div>انزلي ببطء حتى 90 درجة</li>
+                <li><div class="step-n">3</div>ارفعي بدفع الذراعين — الجهاز يخفف الوزن</li>
+                <li><div class="step-n">4</div>للميل للصدر: أميلي الجذع قليلاً للأمام</li>
+              </ul>
+              <div class="muscles-row"><span class="muscle-tag">ترايسبس</span><span class="muscle-tag">صدر سفلي</span><span class="muscle-tag">أكتاف</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GYM SUN - Back + Biceps -->
+      <div class="workout-day-plan" id="wgym-sun">
+        <div class="workout-header-bar">
+          <div class="whb-icon">🔙</div>
+          <div class="whb-info">
+            <div class="whb-title">الأحد — ظهر وبايسبس</div>
+            <div class="whb-meta"><span>📍 الجيم</span><span>⏱ 50 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 240–300 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 50 دقيقة</span>
+          </div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Lat Pulldown</div><div class="ex-meta">4 × 12 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>⬇️</div><div class="ex-anim-label">شد العريضة</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اجلسي واثبّتي الفخذين تحت الوسادة</li><li><div class="step-n">2</div>أمسكي البار أوسع من الكتفين</li><li><div class="step-n">3</div>اشدي لأسفل حتى يلامس الذقن البار</li><li><div class="step-n">4</div>أعيدي ببطء وتحسسي تمدد ظهرك</li></ul><div class="muscles-row"><span class="muscle-tag">ظهر عريض</span><span class="muscle-tag">بايسبس</span><span class="muscle-tag">أكتاف خلفية</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 60 ثانية</div><div class="timer-display" id="t-g-sun-1">60</div><button class="timer-btn" onclick="startTimer('t-g-sun-1',60,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Seated Cable Row</div><div class="ex-meta">4 × 12 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🚣‍♀️</div><div class="ex-anim-label">كابل سحب</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اجلسي وقدماك على المنصة وركبتاك مثنيتان خفيفاً</li><li><div class="step-n">2</div>اسحبي المقبض للسرة مع ضغط كتفيك للخلف</li><li><div class="step-n">3</div>ظهرك مستقيم — لا تتأرجحي</li><li><div class="step-n">4</div>أعيدي ببطء مع التحكم</li></ul><div class="muscles-row"><span class="muscle-tag">ظهر وسط</span><span class="muscle-tag">رومبويد</span><span class="muscle-tag">بايسبس</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 60 ثانية</div><div class="timer-display" id="t-g-sun-2">60</div><button class="timer-btn" onclick="startTimer('t-g-sun-2',60,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Dumbbell Curl</div><div class="ex-meta">3 × 12 لكل ذراع</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>💪</div><div class="ex-anim-label">بايسبس دمبل</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>قفي وأمسكي الدمبل براحة اليد للأعلى</li><li><div class="step-n">2</div>اثبتي الكوع ولا تحركيه — فقط الساعد يتحرك</li><li><div class="step-n">3</div>ارفعي حتى يلامس الدمبل الكتف تقريباً</li><li><div class="step-n">4</div>انزلي ببطء بالتحكم الكامل</li></ul><div class="muscles-row"><span class="muscle-tag">بايسبس</span><span class="muscle-tag">ساعد</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-g-sun-3">45</div><button class="timer-btn" onclick="startTimer('t-g-sun-3',45,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Back Extension بالجهاز</div><div class="ex-meta">3 × 15 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🏹</div><div class="ex-anim-label">ظهر سفلي</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اضبطي الجهاز حتى الحوض فوق الوسادة</li><li><div class="step-n">2</div>انحني للأمام مع إبقاء الظهر مستقيماً</li><li><div class="step-n">3</div>ارفعي الجذع حتى يصير أفقياً</li><li><div class="step-n">4</div>يديك على الصدر أو خلف الرأس</li></ul><div class="muscles-row"><span class="muscle-tag">ظهر سفلي</span><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">أوتار</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- GYM MON - Rest -->
+      <div class="workout-day-plan" id="wgym-mon">
+        <div class="rest-card"><span class="rest-icon">😴</span><h3>الاثنين — يوم الراحة</h3><p>العضلات تنمو في أوقات الراحة. يمكنك مشي هادئ أو تمارين تمدد خفيفة 15 دقيقة.</p></div>
+      </div>
+
+      <!-- GYM TUE - Legs -->
+      <div class="workout-day-plan" id="wgym-tue">
+        <div class="workout-header-bar">
+          <div class="whb-icon">🦵</div>
+          <div class="whb-info">
+            <div class="whb-title">الثلاثاء — أرجل ومؤخرة بالجيم</div>
+            <div class="whb-meta"><span>📍 الجيم</span><span>⏱ 55 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 300–380 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 55 دقيقة</span>
+          </div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Leg Press</div><div class="ex-meta">4 × 15 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🚀</div><div class="ex-anim-label">ضغط الأرجل</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>ضعي القدمين على اللوحة بعرض الكتفين أو أوسع</li><li><div class="step-n">2</div>انزلي حتى تكون الركبتان 90 درجة</li><li><div class="step-n">3</div>ادفعي من الكعب — لا تقفلي الركبة في الأعلى</li><li><div class="step-n">4</div>ظهرك ملتصق بالمسند طوال الوقت</li></ul><div class="muscles-row"><span class="muscle-tag">فخذ أمامي</span><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">بتات</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 75 ثانية</div><div class="timer-display" id="t-g-tue-1">75</div><button class="timer-btn" onclick="startTimer('t-g-tue-1',75,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Hip Abductor Machine</div><div class="ex-meta">4 × 15 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🦋</div><div class="ex-anim-label">مبعد الفخذ</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اجلسي وركبتاك على الوسادتين</li><li><div class="step-n">2</div>افتحي الركبتين للخارج ببطء</li><li><div class="step-n">3</div>أمسكي ثانيتين في أقصى نقطة</li><li><div class="step-n">4</div>أغلقي ببطء — هذا أهم من الفتح</li></ul><div class="muscles-row"><span class="muscle-tag">مؤخرة جانبية</span><span class="muscle-tag">مبعد الفخذ</span><span class="muscle-tag">خصر</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-g-tue-2">45</div><button class="timer-btn" onclick="startTimer('t-g-tue-2',45,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Glute Kickback بالكابل</div><div class="ex-meta">3 × 15 لكل ساق</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🍑</div><div class="ex-anim-label">ركلة المؤخرة</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>ثبّتي الكابل على كاحلك واركعي على يديك</li><li><div class="step-n">2</div>ادفعي الساق للخلف وللأعلى بتقليص المؤخرة</li><li><div class="step-n">3</div>أمسكي ثانيتين ثم انزلي ببطء</li><li><div class="step-n">4</div>حوضك ثابت — لا تدوريه</li></ul><div class="muscles-row"><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">أوتار الركبة</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-g-tue-3">45</div><button class="timer-btn" onclick="startTimer('t-g-tue-3',45,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Standing Calf Raise بالجهاز</div><div class="ex-meta">4 × 20 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>👟</div><div class="ex-anim-label">بتة قائمة</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>ضعي الكتفين تحت الوسادة وأصابع القدم على الحافة</li><li><div class="step-n">2</div>انزلي الكعبين لأسفل أولاً للتمدد</li><li><div class="step-n">3</div>ارفعي ببطء حتى أقصى نقطة</li><li><div class="step-n">4</div>أمسكي ثانية في الأعلى</li></ul><div class="muscles-row"><span class="muscle-tag">بتة</span><span class="muscle-tag">مؤخرة الساق</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- GYM WED - Cardio + Core -->
+      <div class="workout-day-plan" id="wgym-wed">
+        <div class="workout-header-bar">
+          <div class="whb-icon">❤️</div>
+          <div class="whb-info">
+            <div class="whb-title">الأربعاء — كارديو وكور بالجيم</div>
+            <div class="whb-meta"><span>📍 الجيم</span><span>⏱ 45 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 300–400 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 45 دقيقة</span>
+          </div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Treadmill — مشي تصاعدي</div><div class="ex-meta">20 دقيقة — منحدر 5–8%</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🏃‍♀️</div><div class="ex-anim-label">تريدميل</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>ابدأي بدقيقتين إحماء بدون منحدر</li><li><div class="step-n">2</div>ارفعي المنحدر إلى 5% والسرعة 5–6 كم/س</li><li><div class="step-n">3</div>بعد 10 دقائق ارفعي لـ 8% إذا قدرت</li><li><div class="step-n">4</div>دقيقتان تبريد في النهاية</li></ul><div class="muscles-row"><span class="muscle-tag">كارديو</span><span class="muscle-tag">فخذ</span><span class="muscle-tag">مؤخرة</span><span class="muscle-tag">حرق عالي</span></div><div class="set-timer"><div class="set-timer-label">⏱ مؤقت — 20 دقيقة</div><div class="timer-display" id="t-g-wed-1">1200</div><button class="timer-btn" onclick="startTimer('t-g-wed-1',1200,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Elliptical — إيليبتيكال</div><div class="ex-meta">10 دقائق كارديو متوسط</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🔄</div><div class="ex-anim-label">كارديو منخفض الإجهاد</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>استخدمي المقابض للتحريك — يشغّل الجزء العلوي أيضاً</li><li><div class="step-n">2</div>اضبطي المقاومة على 5–7</li><li><div class="step-n">3</div>أفضل من التريدميل للركبتين</li></ul><div class="muscles-row"><span class="muscle-tag">كامل الجسم</span><span class="muscle-tag">كارديو</span><span class="muscle-tag">مناسب للركبتين</span></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Cable Crunch</div><div class="ex-meta">3 × 15 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🎯</div><div class="ex-anim-label">بطن بالكابل</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اركعي أمام جهاز الكابل وأمسكي الحبل خلف رأسك</li><li><div class="step-n">2</div>اثني جذعك للأسفل بتقليص البطن</li><li><div class="step-n">3</div>أعيدي ببطء مع التحكم</li></ul><div class="muscles-row"><span class="muscle-tag">بطن علوي</span><span class="muscle-tag">كور</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 30 ثانية</div><div class="timer-display" id="t-g-wed-3">30</div><button class="timer-btn" onclick="startTimer('t-g-wed-3',30,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Ab Machine</div><div class="ex-meta">3 × 15 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>⚙️</div><div class="ex-anim-label">جهاز البطن</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اجلسي واضبطي الوزن على خفيف (10–20 كغ)</li><li><div class="step-n">2</div>اضغطي للأمام بتقليص البطن — لا تنحني بالعنق</li><li><div class="step-n">3</div>أعيدي ببطء وتحسسي تمدد البطن</li></ul><div class="muscles-row"><span class="muscle-tag">بطن كامل</span><span class="muscle-tag">كور</span></div></div></div>
+        </div>
+      </div>
+
+      <!-- GYM THU - Shoulders -->
+      <div class="workout-day-plan" id="wgym-thu">
+        <div class="workout-header-bar">
+          <div class="whb-icon">🌟</div>
+          <div class="whb-info">
+            <div class="whb-title">الخميس — أكتاف وكامل الجسم</div>
+            <div class="whb-meta"><span>📍 الجيم</span><span>⏱ 50 دقيقة</span></div>
+          </div>
+          <div class="whb-badge">
+            <span class="whb-pill pill-burn">🔥 260–320 سعرة</span>
+            <span class="whb-pill pill-time">⏱ 50 دقيقة</span>
+          </div>
+        </div>
+        <div class="exercise-grid">
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">1</div><div style="flex:1"><div class="ex-name">Shoulder Press بالجهاز</div><div class="ex-meta">4 × 12 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🏆</div><div class="ex-anim-label">ضغط أكتاف</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اضبطي الكرسي حتى المقابض بمستوى الأكتاف</li><li><div class="step-n">2</div>ادفعي للأعلى مع الزفير — لا تقفلي المرفقين</li><li><div class="step-n">3</div>انزلي ببطء حتى المستوى الابتدائي</li></ul><div class="muscles-row"><span class="muscle-tag">أكتاف أمامية</span><span class="muscle-tag">أكتاف جانبية</span><span class="muscle-tag">ترايسبس</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 60 ثانية</div><div class="timer-display" id="t-g-thu-1">60</div><button class="timer-btn" onclick="startTimer('t-g-thu-1',60,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">2</div><div style="flex:1"><div class="ex-name">Lateral Raise بالدمبل</div><div class="ex-meta">3 × 15 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>✈️</div><div class="ex-anim-label">رفع جانبي</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>قفي وأمسكي دمبل خفيف (2–4 كغ) بكل يد</li><li><div class="step-n">2</div>ارفعي الذراعين للجانب حتى مستوى الكتف</li><li><div class="step-n">3</div>المرفق خفيف الانحناء — لا ترفعي فوق الكتف</li><li><div class="step-n">4</div>انزلي ببطء 3 ثوانٍ</li></ul><div class="muscles-row"><span class="muscle-tag">أكتاف جانبية</span><span class="muscle-tag">عرض الكتف</span></div><div class="set-timer"><div class="set-timer-label">⏱ راحة — 45 ثانية</div><div class="timer-display" id="t-g-thu-2">45</div><button class="timer-btn" onclick="startTimer('t-g-thu-2',45,event)">ابدأ</button></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">3</div><div style="flex:1"><div class="ex-name">Face Pull بالكابل</div><div class="ex-meta">3 × 15 تكرار</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🎯</div><div class="ex-anim-label">أكتاف خلفية</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اضبطي الكابل على مستوى الوجه</li><li><div class="step-n">2</div>اسحبي نحو وجهك مع فتح الذراعين للجانب</li><li><div class="step-n">3</div>كوعاك للأعلى — لا للأسفل</li></ul><div class="muscles-row"><span class="muscle-tag">أكتاف خلفية</span><span class="muscle-tag">رومبويد</span><span class="muscle-tag">صحة الكتف</span></div></div></div>
+          <div class="ex-card" onclick="toggleEx(this)"><div class="ex-card-head"><div class="ex-num">4</div><div style="flex:1"><div class="ex-name">Rowing Machine</div><div class="ex-meta">10 دقائق كارديو</div></div><div class="ex-toggle">▼</div></div><div class="ex-body"><div class="ex-anim"><div class="ex-anim-pulse"><div>🚣‍♀️</div><div class="ex-anim-label">تجديف</div></div></div><ul class="steps-list"><li><div class="step-n">1</div>اربطي قدميك ثم اسحبي الحبل مع ثني الركبتين أولاً</li><li><div class="step-n">2</div>امددي الساقين ثم اسحبي للصدر</li><li><div class="step-n">3</div>60–70% من الجهد — مزاجي ومحرق</li></ul><div class="muscles-row"><span class="muscle-tag">كامل الجسم</span><span class="muscle-tag">ظهر</span><span class="muscle-tag">كارديو عالي</span></div><div class="set-timer"><div class="set-timer-label">⏱ مؤقت — 10 دقائق</div><div class="timer-display" id="t-g-thu-4">600</div><button class="timer-btn" onclick="startTimer('t-g-thu-4',600,event)">ابدأ</button></div></div></div>
+        </div>
+      </div>
+
+      <!-- GYM FRI - Rest -->
+      <div class="workout-day-plan" id="wgym-fri">
+        <div class="rest-card"><span class="rest-icon">🌿</span><h3>الجمعة — راحة واسترداد</h3><p>جسمك أنجز أسبوعاً رائعاً في الجيم! استريحي جيداً وتناولي بروتيناً كافياً لبناء العضلات. نراك الأسبوع القادم 💪</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="font-size:1.4rem;margin-bottom:0.5rem">🌿</div>
+  <div>خطة مخصصة لـ <strong id="footer-name">حمده</strong></div>
+  <div style="margin-top:6px;font-size:11px">للتوعية العامة فقط — يُنصح باستشارة طبيب أو اختصاصي تغذية للمتابعة الشخصية</div>
+</footer>
+
+<script>
+// ===== PROFILE DATA =====
+let profile = { name: 'حمده', age: 28, height: 149, weight: 65 };
+
+// ===== THEME =====
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+
+// Restore theme
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀️' : '🌙';
+  }
+})();
+
+// ===== MODAL =====
+function openModal() {
+  document.getElementById('inp-name').value = profile.name;
+  document.getElementById('inp-age').value = profile.age;
+  document.getElementById('inp-height').value = profile.height;
+  document.getElementById('inp-weight').value = profile.weight;
+  document.getElementById('editModal').classList.add('open');
+}
+function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+function step(field, delta) {
+  const el = document.getElementById('inp-' + field);
+  const val = parseFloat(el.value) + delta;
+  const min = parseFloat(el.min); const max = parseFloat(el.max);
+  if (val >= min && val <= max) el.value = field === 'weight' ? val.toFixed(1) : val;
+}
+
+function saveProfile() {
+  profile.name = document.getElementById('inp-name').value.trim() || 'المستخدم';
+  profile.age = parseInt(document.getElementById('inp-age').value) || 28;
+  profile.height = parseInt(document.getElementById('inp-height').value) || 149;
+  profile.weight = parseFloat(document.getElementById('inp-weight').value) || 65;
+  updateUI();
+  closeModal();
+}
+
+// ===== CALCULATIONS =====
+function calcBMI(w, h) { return w / ((h / 100) ** 2); }
+
+function bmiStatus(bmi) {
+  if (bmi < 18.5) return { text: '🔵 نقص وزن', cls: 'status-underweight', color: '#5aabe8' };
+  if (bmi < 25)   return { text: '✅ وزن طبيعي', cls: 'status-normal',      color: '#7acc88' };
+  if (bmi < 30)   return { text: '⚠ زيادة وزن', cls: 'status-overweight',  color: '#d4aa40' };
+                   return { text: '🔴 سمنة',       cls: 'status-obese',       color: '#e24b4a' };
+}
+
+// Mifflin-St Jeor for women (assumed gender from name context) - sedentary factor
+function calcCalories(weight, height, age) {
+  const bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+  const tdee = bmr * 1.2; // sedentary
+  return Math.round(tdee - 400); // deficit for weight loss
+}
+
+function idealWeightRange(h) {
+  const low = Math.round(18.5 * (h / 100) ** 2);
+  const high = Math.round(24.9 * (h / 100) ** 2);
+  return { low, high };
+}
+
+function needlePos(bmi) {
+  // Map BMI 14–40 to 0–100%
+  const pct = Math.min(100, Math.max(0, ((bmi - 14) / 26) * 100));
+  return (100 - pct).toFixed(1) + '%';
+}
+
+// ===== UPDATE UI =====
+function updateUI() {
+  const { name, age, height, weight } = profile;
+  const bmi = calcBMI(weight, height);
+  const bmiRounded = Math.round(bmi * 10) / 10;
+  const status = bmiStatus(bmi);
+  const cals = calcCalories(weight, height, age);
+  const iw = idealWeightRange(height);
+  const diffLow = Math.max(0, Math.round((weight - iw.high) * 10) / 10);
+  const diffHigh = Math.max(0, Math.round((weight - iw.low) * 10) / 10);
+  const targetBMI = Math.round(((iw.low + iw.high) / 2) / ((height / 100) ** 2) * 10) / 10;
+
+  // Macros (30% protein, 40% carbs, 30% fat)
+  const prot = Math.round(cals * 0.30 / 4);
+  const carb = Math.round(cals * 0.40 / 4);
+  const fat  = Math.round(cals * 0.30 / 9);
+
+  // Hero
+  document.getElementById('hero-name').textContent = name;
+  document.getElementById('stat-age').textContent = age;
+  document.getElementById('stat-height').textContent = height + ' سم';
+  document.getElementById('stat-weight').textContent = weight + ' كغ';
+  const bmiEl = document.getElementById('stat-bmi');
+  bmiEl.textContent = bmiRounded;
+  bmiEl.style.color = status.color;
+
+  // Nav + Footer
+  document.getElementById('nav-name').textContent = 'خطة ' + name;
+  document.getElementById('footer-name').textContent = name;
+
+  // BMI section
+  document.getElementById('bmi-num').textContent = bmiRounded;
+  const pill = document.getElementById('bmi-pill');
+  pill.textContent = status.text;
+  pill.className = 'bmi-status-pill ' + status.cls;
+  document.getElementById('bmi-needle').style.right = needlePos(bmi);
+
+  // Cards
+  document.getElementById('target-weight').textContent = iw.low + '–' + iw.high + ' كغ';
+  if (diffLow === 0 && diffHigh === 0) {
+    document.getElementById('weight-diff').textContent = '✓ مثالي';
+  } else {
+    document.getElementById('weight-diff').textContent = diffLow + '–' + diffHigh + ' كغ';
+  }
+  document.getElementById('target-bmi').textContent = targetBMI;
+  document.getElementById('cal-total').textContent = cals.toLocaleString('ar');
+  document.getElementById('macro-p').textContent = prot + 'غ';
+  document.getElementById('macro-c').textContent = carb + 'غ';
+  document.getElementById('macro-f').textContent = fat + 'غ';
+}
+
+// ===== DAY TABS =====
+function showDay(day, btn) {
+  document.querySelectorAll('.day-plan').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.meal-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('day-' + day).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== WORKOUT =====
+let currentLocation = 'home';
+const timers = {};
+
+function switchLocation(loc) {
+  currentLocation = loc;
+  document.querySelectorAll('.workout-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('wc-' + loc).classList.add('active');
+  document.getElementById('loc-' + loc).classList.add('active');
+}
+
+function switchWDay(loc, day, btn) {
+  const prefix = 'w' + loc + '-';
+  document.querySelectorAll('#wc-' + loc + ' .workout-day-plan').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('#wc-' + loc + ' .wday-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(prefix + day).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleEx(card) {
+  card.classList.toggle('expanded');
+}
+
+function startTimer(id, seconds, e) {
+  e.stopPropagation();
+  if (timers[id]) { clearInterval(timers[id]); delete timers[id]; }
+  const el = document.getElementById(id);
+  const btn = el.nextElementSibling;
+  let remaining = seconds;
+
+  function fmt(s) {
+    if (s >= 60) return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+    return s + 'ث';
+  }
+
+  el.textContent = fmt(remaining);
+  btn.textContent = 'إيقاف';
+  el.style.color = '#e24b4a';
+
+  timers[id] = setInterval(() => {
+    remaining--;
+    el.textContent = fmt(remaining);
+    if (remaining <= 0) {
+      clearInterval(timers[id]);
+      delete timers[id];
+      el.textContent = '✓';
+      el.style.color = 'var(--sage)';
+      btn.textContent = 'ابدأ';
+      // Reset after 2s
+      setTimeout(() => {
+        el.textContent = fmt(seconds);
+        el.style.color = 'var(--sage)';
+      }, 2000);
+    }
+  }, 1000);
+}
+
+// ===== SCROLL ANIMATIONS =====
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+// ===== INIT =====
+updateUI();
+</script>
+</body>
+</html>
