@@ -299,15 +299,15 @@ section { padding: 5rem 0; }
 .status-overweight { background: rgba(212,170,64,0.2); border: 1px solid rgba(212,170,64,0.35); color: #d4aa40; }
 .status-obese { background: rgba(226,75,74,0.2); border: 1px solid rgba(226,75,74,0.35); color: #e24b4a; }
 
-.bmi-bar-wrap { margin: 1.2rem 0 0.4rem; position: relative; }
+.bmi-bar-wrap { margin: 1.2rem 0 0.4rem; position: relative; direction: ltr; }
 .bmi-bar {
   height: 9px; border-radius: 5px;
-  background: linear-gradient(to left, #E24B4A, #F0997B, #FAC775, #97C459, #5DCAA5);
+  background: linear-gradient(to right, #5DCAA5, #97C459, #FAC775, #F0997B, #E24B4A);
 }
 .bmi-needle {
   position: absolute; top: -4px; width: 18px; height: 18px;
   background: white; border: 3px solid #d4aa40; border-radius: 50%;
-  transform: translateX(50%); transition: right 0.5s cubic-bezier(.34,1.56,.64,1);
+  transform: translateX(-50%); transition: left 0.5s cubic-bezier(.34,1.56,.64,1);
 }
 .bmi-bar-labels {
   display: flex; justify-content: space-between;
@@ -700,8 +700,8 @@ footer strong { color: #7acc88; }
         <div class="bmi-unit">مؤشر كتلة الجسم (BMI)</div>
         <div class="bmi-status-pill status-overweight" id="bmi-pill">⚠ زيادة وزن</div>
         <div class="bmi-bar-wrap">
-          <div class="bmi-bar"><div class="bmi-needle" id="bmi-needle" style="right:36%"></div></div>
-          <div class="bmi-bar-labels"><span>نحافة</span><span>طبيعي</span><span>زيادة</span><span>سمنة</span></div>
+          <div class="bmi-bar"><div class="bmi-needle" id="bmi-needle" style="left:59%"></div></div>
+          <div class="bmi-bar-labels" style="direction:ltr"><span>نحافة</span><span>طبيعي</span><span>زيادة</span><span>سمنة</span></div>
         </div>
       </div>
 
@@ -1555,9 +1555,9 @@ function idealWeightRange(h) {
 }
 
 function needlePos(bmi) {
-  // Map BMI 14–40 to 0–100%
+  // Map BMI 14–40 to 0–100% left position
   const pct = Math.min(100, Math.max(0, ((bmi - 14) / 26) * 100));
-  return (100 - pct).toFixed(1) + '%';
+  return pct.toFixed(1) + '%';
 }
 
 // ===== UPDATE UI =====
@@ -1595,7 +1595,7 @@ function updateUI() {
   const pill = document.getElementById('bmi-pill');
   pill.textContent = status.text;
   pill.className = 'bmi-status-pill ' + status.cls;
-  document.getElementById('bmi-needle').style.right = needlePos(bmi);
+  document.getElementById('bmi-needle').style.left = needlePos(bmi);
 
   // Cards
   document.getElementById('target-weight').textContent = iw.low + '–' + iw.high + ' كغ';
